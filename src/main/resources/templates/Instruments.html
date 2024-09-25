@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instrument List</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Instrument List</h1>
+    <a href="/instruments/add" class="link-button">Add a new Instrument</a>
+    <ul id="instrument-list">
+        <div th:if="${#lists.isEmpty(instruments)}">
+            <p>No songs available. Please add some songs.</p>
+        </div>
+        
+        <!-- Display songs list when it's not empty -->
+        <ul th:if="${!#lists.isEmpty(instruments)}">
+            <li th:each="instrument : ${Instruments}">
+                <span th:text="${instrument.name} + ' - ' + ${instrument.type}"></span>
+            </li>
+        </ul>
+    </ul>
+
+    
+</body>
+</html>

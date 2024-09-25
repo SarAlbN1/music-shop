@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Instrument</title>
+</head>
+<body>
+    <h1>Edit Instrument</h1>
+    <form th:object="${instrument}" method="post">
+        <label for="name">Name:</label>
+        <input type="text" th:field="*{name}" />
+        <br/>
+        <label for="type">Type:</label>
+        <input type="text" th:field="*{type}" />
+        <br/>
+        <label for="brand">Brand:</label>
+        <input type="text" th:field="*{brand}" />
+        <br/>
+        <label for="price">Price:</label>
+        <input type="number" th:field="*{price}" />
+        <br/>
+        <label for="photo">Photo:</label>
+        <input type="text" th:field="*{photo}" />
+        <br/>
+        <input type="submit" value="Update" />
+    </form>
+</body>
+</html>

@@ -1,68 +1,54 @@
 package co.musicshop.fis.models;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.*;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Entity
 public class Instrument {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long instrumentId;
+    @Column(name = "instrument_id")
+    private Long id;
+
+    @NonNull
     private String name;
+    
+    @NonNull
     private String type;
+
+    @NonNull
     private String brand;
+
+    @NonNull
     private Double price;
+    
+    @NonNull
     private String photo;
+ // no-argument constructor
 
-    // Getters y Setters
-    public Long getInstrumentId() {
-        return instrumentId;
-    }
 
-    public void setInstrumentId(Long instrumentId) {
-        this.instrumentId = instrumentId;
-    }
+    public Instrument(String name, String type, String brand, Double price, String photo) {
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
         this.name = name;
-    }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
         this.type = type;
-    }
 
-    public String getBrand() {
-        return brand;
-    }
-
-    public void setBrand(String brand) {
         this.brand = brand;
-    }
 
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
         this.price = price;
-    }
 
-    public String getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(String photo) {
         this.photo = photo;
+
     }
+    
 }
 

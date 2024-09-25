@@ -1,65 +1,105 @@
 package co.musicshop.fis.controllers;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.ui.Model;
+
+import co.musicshop.fis.dtos.CreateInstrumentDto;
+import co.musicshop.fis.dtos.CreateSongDto;
+import co.musicshop.fis.models.Instrument;
+import co.musicshop.fis.services.InstrumentService;
+import co.musicshop.fis.services.SongService;
+
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import co.musicshop.fis.models.Instrument;
-import co.musicshop.fis.services.InstrumentService;
-
 @RestController
-@RequestMapping("/api/instruments")
+@RequestMapping("/instruments")
 public class InstrumentController {
 
-    @Autowired
     private InstrumentService instrumentService;
 
-    @GetMapping
-    public List<Instrument> getAllInstruments() {
-        return instrumentService.findAll();
+    @Autowired
+    public InstrumentController(InstrumentService instrumentService) {
+        this.instrumentService = instrumentService;
     }
+
+
+    @GetMapping()
+    public ModelAndView getAllInstruments(Model model) {
+        List<Instrument> instruments = instrumentService.findAll();
+        ((Model) model).addAttribute("Instruments", instruments);
+        return new ModelAndView("Instruments");
+        
+    }
+
 
     @GetMapping("/{id}")
-    public ResponseEntity<Instrument> getInstrumentById(@PathVariable Long id) {
+    public ModelAndView getInstrumentById(@PathVariable Long id) {
         Optional<Instrument> instrument = instrumentService.findById(id);
-        return instrument.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        if (instrument.isPresent()) {
+            return new ModelAndView("InstrumentDetails", "instrument", instrument.get());
+        } else {
+            return new ModelAndView("404");
+        }
+
+    }
+    @GetMapping("/{id}/edit")
+    public ModelAndView editInstrumentForm(@PathVariable Long id, Model model) {
+        Optional<Instrument> instrument = instrumentService.findById(id);
+        if (instrument.isPresent()) {
+            model.addAttribute("instrument", instrument.get());
+            return new ModelAndView("InstrumentEdit");
+        } else {
+            return new ModelAndView("404");
+        }
+
     }
 
-    @PostMapping
-    public Instrument createInstrument(@RequestBody Instrument instrument) {
-        return instrumentService.save(instrument);
+    // Mostrar formulario para agregar una canción
+    @GetMapping("/add")
+    public ModelAndView addInstrumentForm(Model model) {
+        model.addAttribute("createInstrumentDto", new CreateInstrumentDto());  // DTO vacío para agregar nueva canción
+        return new ModelAndView("InstrumentAdd"); // Refers to add.html (view)
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Instrument> updateInstrument(@PathVariable Long id, @RequestBody Instrument instrumentDetails) {
+    @PostMapping()
+    public ModelAndView createInstrument(@ModelAttribute("createInstrumentDto") CreateInstrumentDto createInstrumentDto, Model model) {
+        Instrument instrument = new Instrument(
+                createInstrumentDto.getName(),
+                createInstrumentDto.getType(),
+                createInstrumentDto.getBrand(),
+                createInstrumentDto.getPrice(),
+                createInstrumentDto.getPhoto());
+
+        instrumentService.save(instrument);
+        model.addAttribute("instrument", instrument);
+        return new ModelAndView("Instruments"); 
+    }
+
+    @PostMapping("/{id}")
+    public ModelAndView updateInstrument(@PathVariable Long id, @ModelAttribute("instrument") Instrument instrument) {
         Optional<Instrument> instrumentOptional = instrumentService.findById(id);
         if (instrumentOptional.isPresent()) {
-            Instrument instrument = instrumentOptional.get();
-            instrument.setName(instrumentDetails.getName());
-            instrument.setType(instrumentDetails.getType());
-            instrument.setBrand(instrumentDetails.getBrand());
-            instrument.setPrice(instrumentDetails.getPrice());
-            instrument.setPhoto(instrumentDetails.getPhoto());
-            Instrument updatedInstrument = instrumentService.save(instrument);
-            return ResponseEntity.ok(updatedInstrument);
+            Instrument existingInstrument = instrumentOptional.get();
+            existingInstrument.setName(instrument.getName());
+            existingInstrument.setType(instrument.getType());
+            existingInstrument.setBrand(instrument.getBrand());
+            existingInstrument.setPrice(instrument.getPrice());
+            existingInstrument.setPhoto(instrument.getPhoto());
+            Instrument updatedInstrument = instrumentService.save(existingInstrument);
+            ModelAndView modelAndView = new ModelAndView("InstrumentUpdated");
+            modelAndView.addObject("instrument", updatedInstrument);
+            return modelAndView;
         } else {
-            return ResponseEntity.notFound().build();
+            return new ModelAndView("404");
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteInstrument(@PathVariable Long id) {
+    public String deleteInstrument(@PathVariable Long id) {
         instrumentService.deleteById(id);
-        return ResponseEntity.noContent().build();
+        return "redirect:/Instruments";
     }
 }

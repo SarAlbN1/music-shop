@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Agregar Instrumento</title>
+</head>
+<body>
+    <h1>Agregar Instrumento</h1>
+    <form th:object="${createInstrumentDto}" th:action="@{/instruments}" method="post">
+        <label for="name">Nombre:</label>
+        <input type="text" th:field="*{name}" id="name" />
+        <br/>
+        <label for="type">Tipo:</label>
+        <input type="text" th:field="*{type}" id="type" />
+        <br/>
+        <label for="brand">Marca:</label>
+        <input type="text" th:field="*{brand}" id="brand" />
+        <br/>
+        <label for="price">Precio:</label>
+        <input type="number" th:field="*{price}" id="price" />
+        <br/>
+        <label for="photo">Foto:</label>
+        <input type="text" th:field="*{photo}" id="photo" />
+        <br/>
+        <input type="submit" value="Agregar" />
+    </form>
+</body>
+</html>
